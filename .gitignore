@@ -1,0 +1,22 @@
+# Quarto
+/.quarto/
+/_site/
+_freeze/
+*_files/
+
+# R
+.Rhistory
+.Rproj.user
+
+# Python / Jupyter
+*.ipynb
+*.py
+__pycache__/
+.ipynb_checkpoints/
+venv/
+
+# Rendered output
+*.html
+
+# OS
+.DS_Store
