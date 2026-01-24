@@ -1,0 +1,320 @@
+--- 
+title: "NHL Analytics"
+format: 
+  dashboard:
+    logo: images/NHL.png
+    nav-buttons: [linkedin, twitter, github]
+    scrolling: true
+    theme: cosmo
+    sidebar:
+        width: 280
+        background: "#0b1e39"
+        foreground: "white"
+        contents:
+        - id: filters
+---
+
+```{r}
+# Load libraries, data, and define plot theming
+library(tidyverse)
+library(httr)
+library(jsonlite)
+
+# Custom ggplot theme (inspired by Owen Phillips at the F5 substack blog)
+theme_custom <- function () { 
+  theme_minimal(base_size=11, base_family="Outfit") %+replace% 
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.background = element_rect(fill = 'floralwhite', color = "floralwhite"),
+      plot.subtitle = element_text(color = "grey60")
+    )
+}
+
+# Define 538 table theme for Reactable table(s) below
+theme_538 <- function() {
+    reactable::reactableTheme(
+        searchInputStyle = list(width = "31%", backgroundColor = "#F9F9F9"),
+        headerStyle = list(
+            "&:hover[aria-sort]" = list(
+                background = "hsl(0, 0%, 80%)"),
+            "&[aria-sort='ascending'], &[aria-sort='descending']" = list(
+                background = "#555",
+                color = "#FFF"
+            ),
+            borderColor = "#333"
+        ),
+        borderColor = "#CDCDCD"
+    )
+}
+
+asp_ratio <- 1.618
+
+#Define color palette to use in table
+my_color_pal <- c("#ffffff", "#f2fbd2", "#c9ecb4", "#93d3ab", "#35b0ab")
+
+# team colors and logos
+teamcolors <- read_csv("nhl_teamcolors.csv")
+
+# Moneypuck Team Stats data
+mp_teams <- read_csv('https://moneypuck.com/moneypuck/playerData/seasonSummary/2025/regular/teams.csv')
+mp_teams2 <- mp_teams %>%
+  left_join(teamcolors, by = c("name" = "team_abbr")
+  )
+
+# Current standings from NHL API
+standings_df <- GET("https://api-web.nhle.com/v1/standings/now") |>
+  content(as = "text", encoding = "UTF-8") |>
+  fromJSON(flatten = TRUE) |>
+  as_tibble() |>
+  unnest(standings) |>
+  transmute(
+    team_id   = teamAbbrev.default,
+    team      = teamName.default,
+    conference = conferenceName,
+    division   = divisionName,
+    games_played = gamesPlayed,
+    wins      = wins,
+    losses    = losses,
+    ot_losses = otLosses,
+    points    = points,
+    goal_diff = goalDifferential
+  ) |>
+  arrange(
+    desc(points),
+    desc(wins),
+    desc(goal_diff)
+  ) |>
+  mutate(
+    rank = row_number()
+  )
+
+# latest standings date
+latest_date <- format(Sys.time(), "%B %d, %Y")
+
+```
+
+
+
+# Teams
+
+## Column {width = 70%}
+
+::: {.panel-tabset}
+### Standings
+
+```{r}
+library(gt)
+library(gtExtras)
+library(ggtext)
+library(glue)
+library(scales)
+
+standings_df %>%
+  left_join(teamcolors, by = c("team_id" = "team_abbr")) %>%
+  select(rank, team_logo_espn, team:goal_diff) %>%
+gt() %>%
+gt_img_rows(team_logo_espn, height = 30) %>%
+data_color(
+        columns = points, 
+        colors = scales::col_numeric(
+            palette = paletteer::paletteer_d(
+                palette = "ggsci::blue_material",
+                direction = 1
+            ) %>% as.character(),
+            domain = range(standings_df$points, na.rm = TRUE)
+            )
+            ) %>%
+cols_label(
+    rank = "Rank",
+    team_logo_espn = "",
+    team = "Team",
+    conference = "Conference",
+    division.x = "Division",
+    games_played = "GP",
+    wins = "W",
+    losses = "L",
+    ot_losses = "OTL",
+    points = "Points",
+    goal_diff = "Goal Diff"
+  ) %>%
+ tab_header(
+    title = md("**NHL Current Standings**"),
+    subtitle = glue("2025-26 Regular Season. Data as of {latest_date}.")
+  ) %>%
+  tab_source_note(
+    source_note = md("Data: NHL API")
+  ) %>%
+opt_table_font(
+    font = "Outfit"
+    ) %>%
+  tab_options(
+    column_labels.background.color = "white",
+    table.border.top.width = px(3),
+    table.border.top.color = "transparent",
+    table.border.bottom.color = "transparent",
+    table.border.bottom.width = px(3),
+    column_labels.border.top.width = px(3),
+    #column_labels.border.top.color = "transparent",
+    column_labels.border.bottom.width = px(3),
+    column_labels.border.bottom.color = "black",
+    data_row.padding = px(3),
+    source_notes.font.size = 12,
+    table.font.size = 16,
+    heading.align = "center",
+    heading.background.color = "black",
+  )
+
+```
+
+
+### Expected Goals
+
+```{r}
+#| fig-width: 10
+#| fig-height: 6
+#| fig-dpi: 500
+#| out.width: "100%"
+
+library(ggrepel)
+library(ggimage)
+library(ggtext)
+library(glue)
+
+ mp_teams2 <- mp_teams2 %>%
+    filter(situation == 'all')
+    
+mp_teams2 %>%
+  filter(situation == "all") %>%
+  ggplot(aes(x = xGoalsFor, y = xGoalsAgainst)) +
+  geom_image(aes(image = team_logo_espn), size = 0.065, by = "width", asp = asp_ratio) +
+  geom_hline(yintercept = mean(mp_teams2$xGoalsFor), color = "red", linetype = "dashed") +
+  geom_vline(xintercept =  mean(mp_teams2$xGoalsAgainst), color = "red", linetype = "dashed") +
+  labs(
+    title = "Expected Goals 2025-26",
+    x = "xGoals For",
+    y = "xGoals Against",
+    subtitle = "All situations. Data as of date specified.",
+    caption = "Data: @Moneypuck | Plot: @steodosescu",
+  ) +
+  scale_y_reverse() +
+  coord_fixed(ratio = 0.7) +
+  theme_custom() +
+  theme(plot.title.position = "plot",
+        plot.title = element_text(face = "bold", 
+                                  size = 20, 
+                                  hjust = 0.5
+    ),
+    plot.subtitle = element_text(
+      size = 10,
+      hjust = 0.5)
+  ) +
+  theme(plot.subtitle = element_markdown())
+
+```
+
+### Advanced Team Stats
+
+```{r}
+library(gt)
+library(reactable)
+library(reactablefmtr)
+
+mp_teams_rct <- mp_teams2 %>%
+arrange(desc(xGoalsPercentage)) %>%
+mutate(rank = row_number()) %>%
+select(rank, team_logo_espn, name, division, games_played, goalsFor, goalsAgainst, xGoalsPercentage, xGoalsFor, xGoalsAgainst, shotsOnGoalFor, shotsOnGoalAgainst, goalsFor, goalsAgainst, shotAttemptsFor, shotAttemptsAgainst, corsiPercentage
+)
+
+stats_table <- reactable(
+mp_teams_rct,
+theme = theme_538,
+showSortIcon = TRUE,
+columns = list(
+                      name = colDef(name = "Team",
+                                       align = "left"),
+                      division = colDef(name = "Division",
+                                       align = "left"),
+                      rank = colDef(name = "Rank",
+                                       align = "right"),
+                      games_played = colDef(name = "GP",
+                                       align = "right",
+                                       format =  colFormat(digits = 0)),
+                      goalsFor = colDef(name = "GF",
+                                       align = "right",
+                                       format =  colFormat(digits = 0)),
+                      goalsAgainst = colDef(name = "GA",
+                                       align = "right",
+                                       format =  colFormat(digits = 0)),
+                      xGoalsFor = colDef(name = "xGF",
+                                       align = "right",
+                                       format =  colFormat(digits = 0)),
+                      xGoalsAgainst = colDef(name = "xGA",
+                                       align = "right",
+                                       format =  colFormat(digits = 0)),
+                      shotsOnGoalFor = colDef(name = "SoGF",
+                                       align = "right",
+                                       format =  colFormat(digits = 0)),
+                      shotsOnGoalAgainst = colDef(name = "SoGA",
+                                       align = "right",
+                                       format =  colFormat(digits = 0)),
+                      shotAttemptsFor = colDef(name = "SATF",
+                                       align = "right",
+                                       format =  colFormat(digits = 0)),
+                      shotAttemptsAgainst = colDef(name = "SATA",
+                                       align = "right",
+                                       format =  colFormat(digits = 0)),
+                      xGoalsPercentage = colDef(name = "xG %",
+                                       align = "right",
+                                       style = color_scales(mp_teams_rct, colors = my_color_pal),
+                                       format =  colFormat(percent = TRUE, digits = 1)),
+                       corsiPercentage = colDef(name = "Corsi %",
+                                       align = "right",
+                                       format =  colFormat(percent = TRUE, digits = 1)),
+                      
+                      ### add logos using embed_img()
+                      team_logo_espn = colDef(
+                          name = "",
+                          maxWidth = 70,
+                          align = "center",
+                          cell = embed_img(height = "25", width = "30")
+                      )),
+                  searchable = TRUE,
+                  language = reactableLang(
+                      searchPlaceholder = "SEARCH FOR A TEAM (ABBR)..."),
+                  defaultPageSize = 100,
+                  pagination = FALSE,
+                  compact = TRUE, 
+                  borderless = FALSE, 
+                  striped = FALSE,
+                  fullWidth = FALSE, 
+                  defaultColDef = colDef(align = "center", minWidth = 95)
+        ) %>% 
+  add_title("2025-26 NHL Teams Stats",
+            font_size = 28) %>% 
+  add_subtitle("NHL Teams stats",
+               font_size = 14,
+               font_weight = "normal") %>% 
+  add_source("Data: Moneypuck.com")
+
+
+stats_table
+
+```
+
+
+### Stanley Cup Odds
+```{=html}
+
+<iframe title="2025-26 Stanley Cup Odds" aria-label="Table" id="datawrapper-chart-kneUv" src="https://datawrapper.dwcdn.net/kneUv/50/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="2343" data-external="1"></iframe><script type="text/javascript">window.addEventListener("message",function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r,i=0;r=e[i];i++)if(r.contentWindow===a.source){var d=a.data["datawrapper-height"][t]+"px";r.style.height=d}}});</script>
+
+```
+
+
+:::
+
+# Players {orientation="columns" scrolling="true"}
+
+```{r}
+
+
+```
