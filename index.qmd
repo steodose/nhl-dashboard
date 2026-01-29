@@ -315,6 +315,81 @@ stats_table
 # Players {orientation="columns" scrolling="true"}
 
 ```{r}
+library(lubridate)
+library(ggrepel)
+
+# Load and stack daily MVP odds snapshots
+odds_files <- list.files(
+  path = "data",
+  pattern = "^mvp_odds_\\d{4}_\\d{2}_\\d{2}\\.csv$",
+  full.names = TRUE
+)
+
+stopifnot(length(odds_files) > 0)
+
+mvp_odds_ts <- odds_files |>
+  set_names() |>
+  purrr::map_dfr(
+    ~ read_csv(.x, show_col_types = FALSE) |>
+      mutate(
+        snapshot_date = stringr::str_extract(basename(.x), "\\d{4}_\\d{2}_\\d{2}") |>
+          lubridate::ymd()
+      ),
+    .id = "file"
+  ) |>
+  select(snapshot_date, name, mgm_winPct) |>
+  mutate(
+    mgm_winPct = readr::parse_number(as.character(mgm_winPct)),
+    # Normalize to 0-1 implied probability
+    implied_prob = dplyr::if_else(mgm_winPct > 1, mgm_winPct / 100, mgm_winPct)
+  ) |>
+  filter(!is.na(name), !is.na(implied_prob))
+
+latest_snapshot <- max(mvp_odds_ts$snapshot_date, na.rm = TRUE)
+
+# Choose players to plot (top N by latest snapshot)
+players_to_plot <- mvp_odds_ts |>
+  filter(snapshot_date == latest_snapshot) |>
+  arrange(desc(implied_prob)) |>
+  slice_head(n = 10) |>
+  pull(name)
+
+plot_df <- mvp_odds_ts |>
+  filter(name %in% players_to_plot) |>
+  arrange(snapshot_date)
+
+
+# updated attempt
+plot_df %>%
+    ggplot(aes(x = snapshot_date, y = implied_prob, color = name, group = name)) +
+    geom_line(size = 1.2) +
+    geom_point(size = 2) +
+    geom_label_repel(
+        aes(label = paste0(sub(".* ", "", name), " (", implied_prob, ")"), color = name),
+        data = function(d) d %>% group_by(name) %>% slice_tail(n = 1),
+        fill = "white",
+        label.size = 0.20,
+        size = 3,
+        show.legend = FALSE,
+        direction = "y",
+        nudge_x = 5
+    ) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    #scale_color_identity() +  # Use actual hex codes in `primary` column
+    theme_custom() +
+    labs(
+        title = 'NHL Hart Trophy (MVP) Odds Over Time',
+        subtitle = glue::glue("Implied win probability from BetMGM odds. Last updated: {format(latest_snapshot, '%B %d, %Y')}."),
+        x = "",
+        y = "Implied win probability",
+        caption = "Source: Rotowire (BetMGM) | Graphic: @steodosescu"
+    ) +
+    theme(
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.position = "none"
+    )
+
 
 
 ```
