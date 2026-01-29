@@ -312,7 +312,12 @@ stats_table
 
 :::
 
-# Players {orientation="columns" scrolling="true"}
+# Players
+
+## Column {width = 70%}
+
+::: {.panel-tabset}
+### MVP Odds
 
 ```{r}
 library(lubridate)
@@ -393,3 +398,5 @@ plot_df %>%
 
 
 ```
+
+:::
