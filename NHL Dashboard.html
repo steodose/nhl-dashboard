@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>NHL Analytics</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-4d9afe2b8d18ee9fa5d0d57b5ed4214d.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-0b37c64f34216b628666a8dac638b53b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-0b37c64f34216b628666a8dac638b53b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-0b37c64f34216b628666a8dac638b53b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-dashboard/quarto-dashboard.js"></script>
+<script src="site_libs/quarto-dashboard/stickythead.js"></script>
+
+
+
+<script src="site_libs/quarto-dashboard/web-components.js" type="module"></script>
+<script src="site_libs/quarto-dashboard/components.js"></script>
+
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="site_libs/core-js-2.5.3/shim.min.js"></script>
+<script src="site_libs/react-18.2.0/react.min.js"></script>
+<script src="site_libs/react-18.2.0/react-dom.min.js"></script>
+<script src="site_libs/reactwidget-2.0.0/react-tools.js"></script>
+<link href="site_libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="site_libs/reactable-0.4.5/reactable.css" rel="stylesheet">
+<script src="site_libs/reactable-binding-0.4.5/reactable.js"></script>
+
+
+</head>
+
+<body class="quarto-dashboard fullcontent quarto-light">
+
+<header id="quarto-dashboard-header">
+<nav class="navbar navbar-expand-md slim" data-bs-theme="dark">
+  <div class="navbar-container container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-controls="dashboard-collapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>    
+
+
+    <div class="navbar-brand-container">
+    <a href="#"><img src="images/NHL.png" alt="" class="navbar-logo light-content d-inline-block"></a>
+    <a href="#"><img src="images/NHL.png" alt="" class="navbar-logo dark-content d-inline-block"></a>
+      <div class="navbar-title">
+        <div class="navbar-title-text"><a href="#">NHL Analytics</a></div>
+        
+        
+      </div>
+    </div>
+<div id="dashboard-collapse" class="navbar-collapse collapse"><ul class="navbar-nav navbar-nav-scroll me-auto" role="tablist"><li class="nav-item" role="presentation"><a id="tab-teams" class="nav-link active" data-bs-toggle="tab" role="tab" data-bs-target="#teams" data-scrolling="true" href="#teams" aria-controls="teams" aria-selected="true"><span class="nav-link-text">Teams</span></a></li><li class="nav-item" role="presentation"><a id="tab-players" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#players" data-scrolling="true" href="#players" aria-controls="players" aria-selected="false"><span class="nav-link-text">Players</span></a></li></ul><div class="quarto-dashboard-links"><a class="quarto-dashboard-link" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|&amp;title=NHL%20Analytics" title="LinkedIn"><i class="bi bi-linkedin"></i></a><a class="quarto-dashboard-link" href="https://twitter.com/intent/tweet?url=|url|&amp;text=NHL%20Analytics" title="Twitter"><i class="bi bi-twitter"></i></a><a class="quarto-dashboard-link" href="https://github.com/steodose/nhl-dashboard/" title="GitHub"><i class="bi bi-github"></i></a></div></div></div>
+</nav>
+</header>
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-layout-custom quarto-dashboard-content bslib-gap-spacing html-fill-container dashboard-scrolling quarto-dashboard-pages">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+<!-- main -->
+
+<div class="bslib-grid-item html-fill-item tab-content bslib-grid" data-layout="flow" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div id="teams" class="dashboard-page tab-pane show active html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-teams">
+<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content); grid-auto-columns: minmax(0, 1fr);">
+<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="card html-fill-item html-fill-container bslib-card" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="panel-tabset html-fill-item html-fill-container">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Standings</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Expected Goals</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Advanced Team Stats</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Stanley Cup Odds</a></li></ul>
+<div class="tab-content html-fill-item html-fill-container">
+<div id="tabset-1-1" class="tab-pane active html-fill-item html-fill-container" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<div id="gnrvankxrq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;" class="html-fill-item html-fill-container">
+<style>#gnrvankxrq table {
+  font-family: Outfit, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#gnrvankxrq thead, #gnrvankxrq tbody, #gnrvankxrq tfoot, #gnrvankxrq tr, #gnrvankxrq td, #gnrvankxrq th {
+  border-style: none;
+}
+
+#gnrvankxrq p {
+  margin: 0;
+  padding: 0;
+}
+
+#gnrvankxrq .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 3px;
+  border-top-color: rgba(255, 255, 255, 0);
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 3px;
+  border-bottom-color: rgba(255, 255, 255, 0);
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#gnrvankxrq .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#gnrvankxrq .gt_title {
+  color: #FFFFFF;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#gnrvankxrq .gt_subtitle {
+  color: #FFFFFF;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#gnrvankxrq .gt_heading {
+  background-color: #000000;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#gnrvankxrq .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gnrvankxrq .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 3px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 3px;
+  border-bottom-color: #000000;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#gnrvankxrq .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#gnrvankxrq .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#gnrvankxrq .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#gnrvankxrq .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#gnrvankxrq .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 3px;
+  border-bottom-color: #000000;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#gnrvankxrq .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#gnrvankxrq .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#gnrvankxrq .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#gnrvankxrq .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#gnrvankxrq .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#gnrvankxrq .gt_row {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#gnrvankxrq .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gnrvankxrq .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#gnrvankxrq .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#gnrvankxrq .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#gnrvankxrq .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gnrvankxrq .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#gnrvankxrq .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#gnrvankxrq .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gnrvankxrq .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gnrvankxrq .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#gnrvankxrq .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gnrvankxrq .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#gnrvankxrq .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gnrvankxrq .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#gnrvankxrq .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gnrvankxrq .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#gnrvankxrq .gt_sourcenote {
+  font-size: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gnrvankxrq .gt_left {
+  text-align: left;
+}
+
+#gnrvankxrq .gt_center {
+  text-align: center;
+}
+
+#gnrvankxrq .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#gnrvankxrq .gt_font_normal {
+  font-weight: normal;
+}
+
+#gnrvankxrq .gt_font_bold {
+  font-weight: bold;
+}
+
+#gnrvankxrq .gt_font_italic {
+  font-style: italic;
+}
+
+#gnrvankxrq .gt_super {
+  font-size: 65%;
+}
+
+#gnrvankxrq .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#gnrvankxrq .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#gnrvankxrq .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#gnrvankxrq .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#gnrvankxrq .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#gnrvankxrq .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#gnrvankxrq .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#gnrvankxrq .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#gnrvankxrq div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="11" class="gt_heading gt_title gt_font_normal"><strong>NHL Current Standings</strong></td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="11" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">2025-26 Regular Season. Data as of February 07, 2026.</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="rank" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Rank</th>
+<th id="team_logo_espn" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"></th>
+<th id="team" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Team</th>
+<th id="conference" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Conference</th>
+<th id="division.x" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Division</th>
+<th id="games_played" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">GP</th>
+<th id="wins" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">W</th>
+<th id="losses" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">L</th>
+<th id="ot_losses" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">OTL</th>
+<th id="points" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Points</th>
+<th id="goal_diff" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Goal Diff</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">1</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/col.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Colorado Avalanche</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Central</td>
+<td class="gt_row gt_right" headers="games_played">55</td>
+<td class="gt_row gt_right" headers="wins">37</td>
+<td class="gt_row gt_right" headers="losses">9</td>
+<td class="gt_row gt_right" headers="ot_losses">9</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #0D47A1; color: #FFFFFF">83</td>
+<td class="gt_row gt_right" headers="goal_diff">74</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">2</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/tb.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Tampa Bay Lightning</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Atlantic</td>
+<td class="gt_row gt_right" headers="games_played">55</td>
+<td class="gt_row gt_right" headers="wins">37</td>
+<td class="gt_row gt_right" headers="losses">14</td>
+<td class="gt_row gt_right" headers="ot_losses">4</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #1567C2; color: #FFFFFF">78</td>
+<td class="gt_row gt_right" headers="goal_diff">59</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">3</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/car.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Carolina Hurricanes</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Metropolitan</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">36</td>
+<td class="gt_row gt_right" headers="losses">15</td>
+<td class="gt_row gt_right" headers="ot_losses">6</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #1567C2; color: #FFFFFF">78</td>
+<td class="gt_row gt_right" headers="goal_diff">34</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">4</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/min.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Minnesota Wild</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Central</td>
+<td class="gt_row gt_right" headers="games_played">58</td>
+<td class="gt_row gt_right" headers="wins">34</td>
+<td class="gt_row gt_right" headers="losses">14</td>
+<td class="gt_row gt_right" headers="ot_losses">10</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #1567C2; color: #FFFFFF">78</td>
+<td class="gt_row gt_right" headers="goal_diff">27</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">5</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/dal.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Dallas Stars</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Central</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">34</td>
+<td class="gt_row gt_right" headers="losses">14</td>
+<td class="gt_row gt_right" headers="ot_losses">9</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #166AC6; color: #FFFFFF">77</td>
+<td class="gt_row gt_right" headers="goal_diff">33</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">6</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/det.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Detroit Red Wings</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Atlantic</td>
+<td class="gt_row gt_right" headers="games_played">58</td>
+<td class="gt_row gt_right" headers="wins">33</td>
+<td class="gt_row gt_right" headers="losses">19</td>
+<td class="gt_row gt_right" headers="ot_losses">6</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #1B7DDA; color: #FFFFFF">72</td>
+<td class="gt_row gt_right" headers="goal_diff">-1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">7</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/mtl.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Montréal Canadiens</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Atlantic</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">32</td>
+<td class="gt_row gt_right" headers="losses">17</td>
+<td class="gt_row gt_right" headers="ot_losses">8</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #1B7DDA; color: #FFFFFF">72</td>
+<td class="gt_row gt_right" headers="goal_diff">12</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">8</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/buf.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Buffalo Sabres</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Atlantic</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">32</td>
+<td class="gt_row gt_right" headers="losses">19</td>
+<td class="gt_row gt_right" headers="ot_losses">6</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #1D85E2; color: #FFFFFF">70</td>
+<td class="gt_row gt_right" headers="goal_diff">19</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">9</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/pit.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Pittsburgh Penguins</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Metropolitan</td>
+<td class="gt_row gt_right" headers="games_played">56</td>
+<td class="gt_row gt_right" headers="wins">29</td>
+<td class="gt_row gt_right" headers="losses">15</td>
+<td class="gt_row gt_right" headers="ot_losses">12</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #1D85E2; color: #FFFFFF">70</td>
+<td class="gt_row gt_right" headers="goal_diff">23</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">10</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/bos.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Boston Bruins</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Atlantic</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">32</td>
+<td class="gt_row gt_right" headers="losses">20</td>
+<td class="gt_row gt_right" headers="ot_losses">5</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #1E89E6; color: #FFFFFF">69</td>
+<td class="gt_row gt_right" headers="goal_diff">13</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">11</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nyi.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">New York Islanders</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Metropolitan</td>
+<td class="gt_row gt_right" headers="games_played">58</td>
+<td class="gt_row gt_right" headers="wins">32</td>
+<td class="gt_row gt_right" headers="losses">21</td>
+<td class="gt_row gt_right" headers="ot_losses">5</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #1E89E6; color: #FFFFFF">69</td>
+<td class="gt_row gt_right" headers="goal_diff">7</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">12</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/vgk.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Vegas Golden Knights</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Pacific</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">27</td>
+<td class="gt_row gt_right" headers="losses">16</td>
+<td class="gt_row gt_right" headers="ot_losses">14</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #1F8CE9; color: #FFFFFF">68</td>
+<td class="gt_row gt_right" headers="goal_diff">12</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">13</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/was.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Washington Capitals</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Metropolitan</td>
+<td class="gt_row gt_right" headers="games_played">59</td>
+<td class="gt_row gt_right" headers="wins">29</td>
+<td class="gt_row gt_right" headers="losses">23</td>
+<td class="gt_row gt_right" headers="ot_losses">7</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #2195F2; color: #FFFFFF">65</td>
+<td class="gt_row gt_right" headers="goal_diff">12</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">14</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/cbj.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Columbus Blue Jackets</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Metropolitan</td>
+<td class="gt_row gt_right" headers="games_played">56</td>
+<td class="gt_row gt_right" headers="wins">29</td>
+<td class="gt_row gt_right" headers="losses">20</td>
+<td class="gt_row gt_right" headers="ot_losses">7</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #2195F2; color: #FFFFFF">65</td>
+<td class="gt_row gt_right" headers="goal_diff">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">15</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/uta.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Utah Mammoth</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Central</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">30</td>
+<td class="gt_row gt_right" headers="losses">23</td>
+<td class="gt_row gt_right" headers="ot_losses">4</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #2999F3; color: #FFFFFF">64</td>
+<td class="gt_row gt_right" headers="goal_diff">26</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">16</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/edm.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Edmonton Oilers</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Pacific</td>
+<td class="gt_row gt_right" headers="games_played">58</td>
+<td class="gt_row gt_right" headers="wins">28</td>
+<td class="gt_row gt_right" headers="losses">22</td>
+<td class="gt_row gt_right" headers="ot_losses">8</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #2999F3; color: #FFFFFF">64</td>
+<td class="gt_row gt_right" headers="goal_diff">4</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">17</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/ana.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Anaheim Ducks</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Pacific</td>
+<td class="gt_row gt_right" headers="games_played">56</td>
+<td class="gt_row gt_right" headers="wins">30</td>
+<td class="gt_row gt_right" headers="losses">23</td>
+<td class="gt_row gt_right" headers="ot_losses">3</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #319CF4; color: #FFFFFF">63</td>
+<td class="gt_row gt_right" headers="goal_diff">-10</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">18</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/ott.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Ottawa Senators</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Atlantic</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">28</td>
+<td class="gt_row gt_right" headers="losses">22</td>
+<td class="gt_row gt_right" headers="ot_losses">7</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #319CF4; color: #FFFFFF">63</td>
+<td class="gt_row gt_right" headers="goal_diff">7</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">19</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/sea.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Seattle Kraken</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Pacific</td>
+<td class="gt_row gt_right" headers="games_played">56</td>
+<td class="gt_row gt_right" headers="wins">27</td>
+<td class="gt_row gt_right" headers="losses">20</td>
+<td class="gt_row gt_right" headers="ot_losses">9</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #319CF4; color: #FFFFFF">63</td>
+<td class="gt_row gt_right" headers="goal_diff">-3</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">20</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/tor.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Toronto Maple Leafs</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Atlantic</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">27</td>
+<td class="gt_row gt_right" headers="losses">21</td>
+<td class="gt_row gt_right" headers="ot_losses">9</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #319CF4; color: #FFFFFF">63</td>
+<td class="gt_row gt_right" headers="goal_diff">-6</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">21</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/fla.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Florida Panthers</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Atlantic</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">29</td>
+<td class="gt_row gt_right" headers="losses">25</td>
+<td class="gt_row gt_right" headers="ot_losses">3</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #3EA2F5; color: #FFFFFF">61</td>
+<td class="gt_row gt_right" headers="goal_diff">-17</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">22</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/phi.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Philadelphia Flyers</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Metropolitan</td>
+<td class="gt_row gt_right" headers="games_played">56</td>
+<td class="gt_row gt_right" headers="wins">25</td>
+<td class="gt_row gt_right" headers="losses">20</td>
+<td class="gt_row gt_right" headers="ot_losses">11</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #3EA2F5; color: #FFFFFF">61</td>
+<td class="gt_row gt_right" headers="goal_diff">-13</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">23</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/la.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Los Angeles Kings</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Pacific</td>
+<td class="gt_row gt_right" headers="games_played">56</td>
+<td class="gt_row gt_right" headers="wins">23</td>
+<td class="gt_row gt_right" headers="losses">19</td>
+<td class="gt_row gt_right" headers="ot_losses">14</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #44A6F5; color: #FFFFFF">60</td>
+<td class="gt_row gt_right" headers="goal_diff">-15</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">24</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nsh.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Nashville Predators</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Central</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">26</td>
+<td class="gt_row gt_right" headers="losses">24</td>
+<td class="gt_row gt_right" headers="ot_losses">7</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #4DA9F5; color: #000000">59</td>
+<td class="gt_row gt_right" headers="goal_diff">-29</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">25</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/njd.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">New Jersey Devils</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Metropolitan</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">28</td>
+<td class="gt_row gt_right" headers="losses">27</td>
+<td class="gt_row gt_right" headers="ot_losses">2</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #54ADF6; color: #000000">58</td>
+<td class="gt_row gt_right" headers="goal_diff">-29</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">26</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/sj.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">San Jose Sharks</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Pacific</td>
+<td class="gt_row gt_right" headers="games_played">55</td>
+<td class="gt_row gt_right" headers="wins">27</td>
+<td class="gt_row gt_right" headers="losses">24</td>
+<td class="gt_row gt_right" headers="ot_losses">4</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #54ADF6; color: #000000">58</td>
+<td class="gt_row gt_right" headers="goal_diff">-22</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">27</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/chi.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Chicago Blackhawks</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Central</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">22</td>
+<td class="gt_row gt_right" headers="losses">26</td>
+<td class="gt_row gt_right" headers="ot_losses">9</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #7FC1F8; color: #000000">53</td>
+<td class="gt_row gt_right" headers="goal_diff">-31</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">28</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/cgy.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Calgary Flames</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Pacific</td>
+<td class="gt_row gt_right" headers="games_played">56</td>
+<td class="gt_row gt_right" headers="wins">23</td>
+<td class="gt_row gt_right" headers="losses">27</td>
+<td class="gt_row gt_right" headers="ot_losses">6</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #88C6F8; color: #000000">52</td>
+<td class="gt_row gt_right" headers="goal_diff">-27</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">29</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/wpg.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Winnipeg Jets</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Central</td>
+<td class="gt_row gt_right" headers="games_played">56</td>
+<td class="gt_row gt_right" headers="wins">22</td>
+<td class="gt_row gt_right" headers="losses">26</td>
+<td class="gt_row gt_right" headers="ot_losses">8</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #88C6F8; color: #000000">52</td>
+<td class="gt_row gt_right" headers="goal_diff">-15</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">30</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nyr.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">New York Rangers</td>
+<td class="gt_row gt_left" headers="conference">Eastern</td>
+<td class="gt_row gt_left" headers="division.x">Metropolitan</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">22</td>
+<td class="gt_row gt_right" headers="losses">29</td>
+<td class="gt_row gt_right" headers="ot_losses">6</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #9BCFFA; color: #000000">50</td>
+<td class="gt_row gt_right" headers="goal_diff">-29</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="rank">31</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/stl.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">St. Louis Blues</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Central</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">20</td>
+<td class="gt_row gt_right" headers="losses">28</td>
+<td class="gt_row gt_right" headers="ot_losses">9</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #A5D3FA; color: #000000">49</td>
+<td class="gt_row gt_right" headers="goal_diff">-56</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="rank">32</td>
+<td class="gt_row gt_left" headers="team_logo_espn"><img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/van.png" class="img-fluid" style="height:30px;"></td>
+<td class="gt_row gt_left" headers="team">Vancouver Canucks</td>
+<td class="gt_row gt_left" headers="conference">Western</td>
+<td class="gt_row gt_left" headers="division.x">Pacific</td>
+<td class="gt_row gt_right" headers="games_played">57</td>
+<td class="gt_row gt_right" headers="wins">18</td>
+<td class="gt_row gt_right" headers="losses">33</td>
+<td class="gt_row gt_right" headers="ot_losses">6</td>
+<td class="gt_row gt_right" headers="points" style="background-color: #E3F2FD; color: #000000">42</td>
+<td class="gt_row gt_right" headers="goal_diff">-61</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_sourcenotes odd">
+<td colspan="11" class="gt_sourcenote">Data: NHL API</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+<div id="tabset-1-2" class="tab-pane html-fill-item html-fill-container" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<img src="NHL-Dashboard_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid quarto-dashboard-img-contain" style="width:100.0%">
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+<div id="tabset-1-3" class="tab-pane html-fill-item html-fill-container" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<h1 style="color:#000;background:#FFFFFF;text-align:left;font-size:28px;font-style:normal;font-weight:bold;text-decoration:;letter-spacing:px;word-spacing:px;text-transform:;text-shadow:;margin-top:0px;margin-right:0px;margin-bottom:0px;margin-left:0px">2025-26 NHL Teams Stats</h1>
+<h2 style="color:#000;background:#FFFFFF;text-align:left;font-size:14px;font-style:normal;font-weight:normal;text-decoration:;letter-spacing:px;word-spacing:px;text-transform:;text-shadow:;margin-top:0px;margin-right:0px;margin-bottom:0px;margin-left:0px">NHL Teams stats</h2>
+<div class="reactable html-widget html-fill-item html-fill-container" id="htmlwidget-b15769f5939f8127915e" style="width:auto;height:auto;"></div>
+<p style="color:#000;background:#FFFFFF;text-align:left;font-size:16px;font-style:normal;font-weight:normal;text-decoration:;letter-spacing:px;word-spacing:px;text-transform:;text-shadow:;margin-top:0px;margin-right:0px;margin-bottom:0px;margin-left:0px">Data: Moneypuck.com</p>
+<script type="application/json" data-for="htmlwidget-b15769f5939f8127915e">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"rank":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32],"team_logo_espn":["https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/col.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/car.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/tb.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/ott.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/vgk.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/pit.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/dal.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/det.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/min.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/edm.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/was.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/fla.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/uta.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/ana.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/phi.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/la.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/mtl.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/tor.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/buf.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/cbj.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nsh.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/njd.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nyi.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/cgy.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/wpg.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/sj.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/sea.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nyr.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/stl.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/bos.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/van.png","https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/chi.png"],"name":["COL","CAR","TBL","OTT","VGK","PIT","DAL","DET","MIN","EDM","WSH","FLA","UTA","ANA","PHI","LAK","MTL","TOR","BUF","CBJ","NSH","NJD","NYI","CGY","WPG","SJS","SEA","NYR","STL","BOS","VAN","CHI"],"division":["Central","Metropolitan","Atlantic","Atlantic","Pacific","Metropolitan","Central","Atlantic","Central","Pacific","Metropolitan","Atlantic","Pacific","Pacific","Metropolitan","Pacific","Atlantic","Atlantic","Atlantic","Metropolitan","Central","Metropolitan","Metropolitan","Pacific","Central","Pacific","Pacific","Metropolitan","Central","Atlantic","Pacific","Central"],"games_played":[55,57,55,57,57,56,57,58,58,58,59,57,57,56,56,56,57,57,57,56,57,57,58,56,56,55,56,57,57,57,57,57],"goalsFor":[211,193,195,188,190,191,189,172,192,198,188,170,183,179,162,142,197,187,192,174,166,143,165,140,159,169,161,149,146,193,145,151],"goalsAgainst":[133,160,138,184,173,162,157,172,166,191,172,190,157,195,177,155,183,193,176,176,198,175,157,167,173,192,161,180,200,179,208,180],"xGoalsPercentage":[0.57,0.56,0.55,0.54,0.54,0.53,0.52,0.51,0.51,0.51,0.51,0.51,0.5,0.5,0.5,0.5,0.5,0.49,0.49,0.49,0.49,0.49,0.48,0.48,0.47,0.47,0.47,0.46,0.46,0.46,0.46,0.45],"xGoalsFor":[202.42,205.32,195.84,179.99,179.76,185.23,183.64,184.09,181.05,196.18,195.06,185.72,177.74,181.69,161.21,166.85,180,167.78,178.36,179.77,178.79,168.96,173.61,163.94,165.47,160.45,156.85,160.13,146.12,168.36,171.67,151.82],"xGoalsAgainst":[150.83,162.46,157.13,151.94,152.5,167.32,167.14,174.42,170.75,190.3,188.5,176.75,174.37,184.69,161.44,164.63,183.42,177.89,186.52,184.5,182.57,173.57,191.75,174.47,183.01,180.25,175.59,188.5,172.66,195.27,202.25,186.47],"shotsOnGoalFor":[1879,1819,1548,1623,1644,1627,1458,1645,1677,1742,1721,1655,1584,1687,1438,1546,1497,1558,1575,1669,1630,1671,1594,1625,1471,1404,1420,1452,1430,1550,1533,1411],"shotsOnGoalAgainst":[1468,1389,1451,1395,1419,1530,1532,1607,1740,1569,1670,1472,1483,1615,1438,1516,1558,1805,1715,1695,1680,1583,1620,1621,1570,1686,1638,1641,1577,1713,1707,1680],"shotAttemptsFor":[3858,4011,3296,3369,3373,3363,2904,3468,3464,3433,3568,3523,3334,3623,2995,3464,3185,3124,3217,3446,3432,3466,3301,3421,3050,2898,3006,3279,2961,3299,3336,2951],"shotAttemptsAgainst":[3067,2775,2939,2948,3231,3300,3271,3539,3643,3348,3556,3070,3161,3390,3197,3147,3402,3686,3532,3476,3182,3299,3451,3323,3279,3450,3585,3460,3301,3552,3489,3369],"corsiPercentage":[0.56,0.59,0.53,0.53,0.51,0.5,0.47,0.49,0.49,0.51,0.5,0.53,0.51,0.52,0.48,0.52,0.48,0.46,0.48,0.5,0.52,0.51,0.49,0.51,0.48,0.46,0.46,0.49,0.47,0.48,0.49,0.47]},"columns":[{"id":"rank","name":"Rank","type":"numeric","minWidth":95,"align":"right"},{"id":"team_logo_espn","name":"","type":"character","minWidth":95,"align":"center","cell":[{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/col.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/car.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/tb.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/ott.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/vgk.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/pit.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/dal.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/det.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/min.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/edm.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/was.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/fla.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/uta.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/ana.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/phi.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/la.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/mtl.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/tor.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/buf.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/cbj.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nsh.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/njd.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nyi.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/cgy.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/wpg.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/sj.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/sea.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nyr.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/stl.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/bos.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/van.png","align":"center","height":"25","width":"30"},"children":[]}]}]},{"name":"Fragment","attribs":[],"children":[{"name":"div","attribs":{"style":{"display":"flex","justifyContent":"center"}},"children":[{"name":"img","attribs":{"src":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/chi.png","align":"center","height":"25","width":"30"},"children":[]}]}]}],"maxWidth":70},{"id":"name","name":"Team","type":"character","minWidth":95,"align":"left"},{"id":"division","name":"Division","type":"character","minWidth":95,"align":"left"},{"id":"games_played","name":"GP","type":"numeric","minWidth":95,"align":"right","format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"goalsFor","name":"GF","type":"numeric","minWidth":95,"align":"right","format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"goalsAgainst","name":"GA","type":"numeric","minWidth":95,"align":"right","format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"xGoalsPercentage","name":"xG %","type":"numeric","minWidth":95,"align":"right","format":{"cell":{"digits":1,"percent":true},"aggregated":{"digits":1,"percent":true}},"style":[{"background":"#35B0ABFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#54BBABFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#73C7ABFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#92D2ABFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#92D2ABFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#A4DBADFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#B6E3B1FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#C8EBB4FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#C8EBB4FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#C8EBB4FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#C8EBB4FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#C8EBB4FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#D6F1BEFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#D6F1BEFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#D6F1BEFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#D6F1BEFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#D6F1BEFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#E4F6C8FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#E4F6C8FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#E4F6C8FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#E4F6C8FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#E4F6C8FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#F2FBD2FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#F2FBD2FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#F6FCE1FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#F6FCE1FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#F6FCE1FF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#FAFDEFFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#FAFDEFFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#FAFDEFFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#FAFDEFFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"},{"background":"#FFFFFFFF","color":"black","fontSize":null,"fontWeight":"normal","transition":"background 1s ease"}]},{"id":"xGoalsFor","name":"xGF","type":"numeric","minWidth":95,"align":"right","format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"xGoalsAgainst","name":"xGA","type":"numeric","minWidth":95,"align":"right","format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"shotsOnGoalFor","name":"SoGF","type":"numeric","minWidth":95,"align":"right","format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"shotsOnGoalAgainst","name":"SoGA","type":"numeric","minWidth":95,"align":"right","format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"shotAttemptsFor","name":"SATF","type":"numeric","minWidth":95,"align":"right","format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"shotAttemptsAgainst","name":"SATA","type":"numeric","minWidth":95,"align":"right","format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"corsiPercentage","name":"Corsi %","type":"numeric","minWidth":95,"align":"right","format":{"cell":{"digits":1,"percent":true},"aggregated":{"digits":1,"percent":true}}}],"searchable":true,"pagination":false,"defaultPageSize":100,"compact":true,"inline":true,"theme":{"borderColor":"#CDCDCD","headerStyle":{"&:hover[aria-sort]":{"background":"hsl(0, 0%, 80%)"},"&[aria-sort='ascending'], &[aria-sort='descending']":{"background":"#555","color":"#FFF"},"borderColor":"#333"},"searchInputStyle":{"width":"31%","backgroundColor":"#F9F9F9"}},"language":{"searchPlaceholder":"SEARCH FOR A TEAM (ABBR)..."},"dataKey":"4175e63638a9a16f91352f3015135a2b"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+<div id="tabset-1-4" class="tab-pane html-fill-item html-fill-container" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+
+<iframe title="2025-26 Stanley Cup Odds" aria-label="Table" id="datawrapper-chart-kneUv" src="https://datawrapper.dwcdn.net/kneUv/50/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="2343" data-external="1"></iframe><script type="text/javascript">window.addEventListener("message",function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r,i=0;r=e[i];i++)if(r.contentWindow===a.source){var d=a.data["datawrapper-height"][t]+"px";r.style.height=d}}});</script>
+
+</div>
+</div>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+</div>
+</div>
+<div id="players" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-scrolling="true" data-orientation="columns" aria-labelledby="tab-players">
+<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: ;
+grid-auto-rows: minmax(0, 1fr);">
+<div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden html-fill-item html-fill-container">
+
+</div>
+</div>
+</div>
+</div>
+
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+<script type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (_event) {
+  if (window.bslib.Card) {
+    window.bslib.Card.initializeAllCards();
+  }
+}); 
+</script>
+  
+
+
+
+</body></html>
